@@ -1,0 +1,15 @@
+Package: tricot
+Version: 0.0.0.9000
+Title: Create a kniting image from an image
+Description: From any image, creation of an image to knit a rectangle representing the simplified image and a summary table of colors and number of stitches according to the chosen needles.
+Authors@R: c(person(given = "Marie",
+         family = "Vaugoyeau",
+         role = c("aut", "cre"),
+         email = "marie.vaugoyeau@gmail.com"),
+  person(given = "MStats",
+         role = "cph"))
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1

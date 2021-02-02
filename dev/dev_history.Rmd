@@ -1,0 +1,127 @@
+---
+title: "dev_history.Rmd for working package"
+author: "Sébastien Rochette"
+date: "23/01/2021"
+output: html_document
+---
+
+```{r development, include=FALSE}
+library(testthat)
+```
+
+<!--
+# Description of your package
+
+This will fill the description of your package.
+Add this chunk using `fusen::description_chunk()`
+--> 
+
+```{r description}
+# Describe your package
+fusen::fill_description(
+  fields = list(
+    Title = "Create a kniting image from an image",
+    Description = "From any image, creation of an image to knit a rectangle representing the simplified image and a summary table of colors and number of stitches according to the chosen needles.",
+    `Authors@R` = c(
+      person("Marie", "Vaugoyeau", email = "marie.vaugoyeau@gmail.com", role = c("aut", "cre")),
+      person(given = "MStats", role = "cph")
+    )
+  )
+)
+# Define License with use_*_license()
+usethis::use_mit_license("Marie Vaugoyeau")
+```
+
+STOP, je me suis arrêtée là !
+Pause de 5 minutes !
+
+
+# Calculate the median of a vector
+
+```{r function}
+#' My median
+#'
+#' @param x Vector of Numeric values
+#' @inheritParams stats::median
+#'
+#' @return
+#' Median of vector x
+#' @export
+#'
+#' @examples
+my_median <- function(x, na.rm = TRUE) {
+  if (!is.numeric(x)) {stop("x should be numeric")}
+  stats::median(x, na.rm = na.rm)
+}
+```
+
+```{r examples}
+my_median(1:12)
+```
+
+```{r tests}
+test_that("my_median works properly and show error if needed", {
+  expect_true(my_median(1:12) == 6.5)
+  expect_error(my_median("text"))
+})
+```
+
+# Calculate the mean of a vector
+## Use sub-functions in the same chunk
+
+```{r function-1}
+#' My Other median
+#'
+#' @param x Vector of Numeric values
+#' @inheritParams stats::median
+#'
+#' @return
+#' Median of vector x
+#' @export
+#'
+#' @examples
+my_other_median <- function(x, na.rm = TRUE) {
+  if (!is.numeric(x)) {stop("x should be numeric")}
+  sub_median(x, na.rm =na.rm)
+}
+
+#' Core of the median not exported
+#' @param x Vector of Numeric values
+#' @inheritParams stats::median
+sub_median <- function(x, na.rm = TRUE) {
+  stats::median(x, na.rm)
+}
+```
+
+```{r examples-1}
+my_other_median(1:12)
+```
+
+```{r tests-1}
+test_that("my_median works properly and show error if needed", {
+  expect_true(my_other_median(1:12) == 6.5)
+  expect_error(my_other_median("text"))
+})
+```
+
+# There can be development actions
+
+These will be included in the `dev_history.R` file of your package, but won't be direct part of it.
+
+```{r development-1, eval=FALSE}
+# Run but keep eval=FALSE to avoid infinite loop
+# Execute in the console directly
+fusen::inflate(rmd = "dev/dev_history.Rmd")
+```
+
+
+# Inflate your package
+
+You're one inflate from paper to box.
+Build your package from this very Rmarkdown using `fusen::inflate()`
+
+- Verify your `"DESCRIPTION"` file has been updated
+- Verify your function is in `"R/"` directory
+- Verify your test is in `"tests/testthat/"` directory
+- Verify this Rmd appears in `"vignettes/"` directory
+
