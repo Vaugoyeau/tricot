@@ -31,6 +31,46 @@ fusen::fill_description(
 # Define License with use_*_license()
 usethis::use_mit_license("Marie Vaugoyeau")
 ```
+  
+  
+# Load image  
+
+```{r function}
+
+#' Load image
+#'
+#' @param path Path to load image
+#' @inheritParams magick::image_read 
+#' @inheritParams stringr::str_detect
+#'
+#' @return
+#' Image in R
+#' @export
+#'
+#' @examples
+image_load <- function(path) {
+  if (!file.exists(path)) {stop("path is incorrect")}
+  
+  if (sum(stringr::str_detect(path, c(".jpeg", ".jpg", ".png"))) > 0) {magick::image_read(path)}
+  else if (stringr::str_detect(path, ".pdf")) {magick::image_read_pdf(path, pages = 1)}
+  else {stop("format is not supported")}
+}
+
+```
+  
+```{r examples}
+image_load("img/PeintureLaetitia.jpg")
+image_load("img/PullOurs.pdf")
+```
+
+```{r tests}
+test_that("load image and show error if needed", {
+  expect_true(class(image_load("img/PeintureLaetitia.jpg")) == "magick-image")
+  expect_error(image_load("text"))
+})
+```
+
+  
 
 STOP, je me suis arrêtée là !
 Pause de 5 minutes !
