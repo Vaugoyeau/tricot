@@ -51,7 +51,7 @@ usethis::use_mit_license("Marie Vaugoyeau")
 image_load <- function(path) {
   if (!file.exists(path)) {stop("path is incorrect")}
   
-  if (sum(stringr::str_detect(path, c(".jpeg", ".jpg", ".png"))) > 0) {magick::image_read(path)}
+  if (sum(stringr::str_detect(path, c(".jpeg", ".jpg", ".png", ".tif"))) > 0) {magick::image_read(path)}
   else if (stringr::str_detect(path, ".pdf")) {magick::image_read_pdf(path, pages = 1)}
   else {stop("format is not supported")}
 }
@@ -60,7 +60,9 @@ image_load <- function(path) {
   
 ```{r examples}
 image_load("img/PeintureLaetitia.jpg")
-image_load("img/PullOurs.pdf")
+image_load("img/Montagne.pdf")
+image_load("img/Pingouin.png")
+image_load("img/Monstre.tif")
 ```
 
 ```{r tests}
@@ -73,7 +75,6 @@ test_that("load image and show error if needed", {
   
 
 STOP, je me suis arrêtée là !
-Pause de 5 minutes !
 
 
 # Calculate the median of a vector
