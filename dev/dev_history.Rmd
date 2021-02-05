@@ -78,7 +78,7 @@ Normally on the balls of wool there is the information to knit a square of 10 x 
   
 ```{r function-1}
 
-#' Load image
+#' Square of size
 #'
 #' @param rg Row number to have 10 cm
 #' @param m Stitch number to have 10 cm
@@ -111,10 +111,135 @@ test_that("calcule square size and show error if needed", {
   expect_error(square_size("text"))
 })
 ```
+  
+  
+# Calculate the size of pixel   
+  
+Calculation of the pixel size according to the size of the row and the previously given stitch and with the size of the knit you are looking for.  
+  
+```{r function-2}
 
+#' Grid size
+#'
+#' @param h Expected height (cm) of knitting
+#' @param w Expected width (cm) of knitting
+#' @param ss Size square calculated from square_size()
+#'
+#' @return
+#' Grid size to do grid on image
+#' @export
+#'
+#' @examples
+grid_size <- function(h, w, ss) {
+  if (!is.numeric(h)) {stop("h should be numeric")}
+  if (!is.numeric(w)) {stop("w should be numeric")}
+  
+  c(
+    grid = ceiling(h/ss["height"]),
+    grid = ceiling(w/ss["width"])
+  )
+}
+
+```
+  
+```{r examples-2}
+grid_size(5, 5, square_size(31,24)) 
+grid_size(5, 5, square_size(35,26))
+```
+
+```{r tests-2}
+test_that("calcule grid size and show error if needed", {
+  expect_true(sum(grid_size(5, 5, square_size(35,26)) == c(grid.height = 18, grid.width = 13)) == 2)
+  expect_error(square_size("text"))
+})
+```
+  
+  
+# Calculate the square size in image     
+  
+```{r function-3}
+
+#' Pixel size in image
+#'
+#' @param image_height Magick image height
+#' @param image_width Magick image width
+#' @param gs Size grid calculated from grid_size()
+#'
+#' @return
+#' Square size of image
+#' @export
+#'
+#' @examples
+pixel_size <- function(image_height, image_width, gs) {
+  
+  c(
+    pixel = floor(image_height/gs["grid.height"]),
+    pixel = floor(image_width/gs["grid.width"])
+  )
+  
+}
+
+```
+  
+```{r examples-3}
+pixel_size(magick::image_info(image_load("img/Pingouin.png"))["height"], magick::image_info(image_load("img/Pingouin.png"))["width"], grid_size(5, 5, square_size(31,24)))   
+```
+
+```{r tests-3}
+test_that("calcule pixel size and show error if needed", {
+  expect_true(sum(pixel_size(magick::image_info(image_load("img/Pingouin.png"))["height"], magick::image_info(image_load("img/Pingouin.png"))["width"], grid_size(5, 5, square_size(31,24))) == c(pixel.height = 73, pixel.width = 98)) == 2)
+  expect_error(pixel_size("text"))
+})
+```
+  
+STOP, je me suis arrêtée là !
+  
+  
+# Application of grid on image     
+  
+Now we have grid size and image, we need to find color of each pixel of grid.  
+  
+```{r function-3}
+
+#' Extract color from square
+#'
+#' @param image Magick image from image_load
+#' @param w Expected width (cm) of knitting
+#' @param ss Size square calculated from square_size()
+#'
+#' @return
+#' Grid size to do grid on image
+#' @export
+#'
+#' @examples
+grid_size <- function(h, w, ss) {
+  if (!is.numeric(h)) {stop("h should be numeric")}
+  if (!is.numeric(w)) {stop("w should be numeric")}
+  
+  c(
+    grid_height = ceiling(h/ss["height"]),
+    grid_width = ceiling(w/ss["width"])
+  )
+}
+
+```
+  
+```{r examples-2}
+grid_size(5, 5, square_size(31,24)) 
+grid_size(5, 5, square_size(35,26))
+```
+
+```{r tests-2}
+test_that("calcule grid size and show error if needed", {
+  expect_true(sum(grid_size(5, 5, square_size(35,26)) == c(grid_height = 18, grid_width = 13)) == 2)
+  expect_error(square_size("text"))
+})
+```
+  
+  
   
 
-STOP, je me suis arrêtée là !
+
 
 
 # Calculate the median of a vector
