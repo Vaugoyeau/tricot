@@ -44,7 +44,7 @@ usethis::use_mit_license("Marie Vaugoyeau")
 #' @inheritParams stringr::str_detect
 #'
 #' @return
-#' Image in R
+#' Magick image in R
 #' @export
 #'
 #' @examples
@@ -69,6 +69,46 @@ image_load("img/Monstre.tif")
 test_that("load image and show error if needed", {
   expect_true(class(image_load("img/PeintureLaetitia.jpg")) == "magick-image")
   expect_error(image_load("text"))
+})
+```
+
+# Calculate the size of square based on the information provided on the label   
+  
+Normally on the balls of wool there is the information to knit a square of 10 x 10 cm.
+  
+```{r function-1}
+
+#' Load image
+#'
+#' @param rg Row number to have 10 cm
+#' @param m Stitch number to have 10 cm
+#'
+#' @return
+#' Square size to do grid on image
+#' @export
+#'
+#' @examples
+square_size <- function(rg, m) {
+  if (!is.numeric(rg)) {stop("rg should be numeric")}
+  if (!is.numeric(m)) {stop("m should be numeric")}
+  
+  c(
+    height = round(10/rg, 3),
+    width = round(10/m, 3)
+  )
+}
+
+```
+  
+```{r examples-1}
+square_size(31,24)
+square_size(35,26)
+```
+
+```{r tests-1}
+test_that("calcule square size and show error if needed", {
+  expect_true(sum(square_size(31,24) == c(height = 0.323, width = 0.417)) == 2)
+  expect_error(square_size("text"))
 })
 ```
 
