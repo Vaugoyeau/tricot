@@ -172,6 +172,9 @@ test_that("calcule grid size and show error if needed", {
 #' @examples
 pixel_size <- function(image_height, image_width, gs) {
   
+  if (!is.numeric(image_height)) {stop("image_height should be numeric")}
+  if (!is.numeric(image_width)) {stop("image_width should be numeric")}
+  
   c(
     pixel = floor(image_height/gs["grid.height"]),
     pixel = floor(image_width/gs["grid.width"])
@@ -182,15 +185,62 @@ pixel_size <- function(image_height, image_width, gs) {
 ```
   
 ```{r examples-3}
-pixel_size(magick::image_info(image_load("img/Pingouin.png"))["height"], magick::image_info(image_load("img/Pingouin.png"))["width"], grid_size(5, 5, square_size(31,24)))   
+
+pixel_size(1181, 1181, c("grid.height" = 31, "grid.width" = 24)) # Pingouin
+pixel_size(3509, 2481, c("grid.height" = 35, "grid.width" = 26)) # Montagne
+
 ```
 
 ```{r tests-3}
 test_that("calcule pixel size and show error if needed", {
-  expect_true(sum(pixel_size(magick::image_info(image_load("img/Pingouin.png"))["height"], magick::image_info(image_load("img/Pingouin.png"))["width"], grid_size(5, 5, square_size(31,24))) == c(pixel.height = 73, pixel.width = 98)) == 2)
+  expect_true(sum(pixel_size(1181, 1181, c("grid.height" = 31, "grid.width" = 24)) == c(pixel.height = 38, pixel.width = 49)) == 2)
   expect_error(pixel_size("text"))
 })
 ```
+  
+  
+# Creation of new image  
+  
+We assume that we have created a table with the values of each pixel using the function `magick::image_raster()`.  
+  
+```{r function-4}
+
+#' Create image to knit
+#'
+#' @param img_raster Magick image raster
+#' @param ps Pixel size calculated from pixel_size()
+#'
+#' @return
+#' Knitting image
+#' @export
+#'
+#' @examples
+pixel_size <- function(image_height, image_width, gs) {
+  
+  if (!is.numeric(image_height)) {stop("image_height should be numeric")}
+  if (!is.numeric(image_width)) {stop("image_width should be numeric")}
+  
+  c(
+    pixel = floor(image_height/gs["grid.height"]),
+    pixel = floor(image_width/gs["grid.width"])
+  )
+  
+}
+
+```
+
+```{r test_mise_en_forme_image}
+
+test <- magick::image_raster(image_load("img/Pingouin.png"))
+
+ggplot2::ggplot(test) + ggplot2::aes(x = x, y = y, fill = col) + ggplot2::geom_point() + ggplot2::theme(legend.position = "none")
+
+test <- tibble::tibble(x = rep(c(1:3), 2), y = rep(c(1:2),3), col = c("#ffffffff", "#ffedb7ff", "#efefefff", "#d9d9d9ff", "#ffc000ff", "#c7c7c7ff"))
+
+ggplot2::ggplot(test) + ggplot2::aes(x = x, y = y, fill = col) + ggplot2::geom_tile() + ggplot2::theme(legend.position = "none")
+
+```
+
   
 STOP, je me suis arrêtée là !
   
