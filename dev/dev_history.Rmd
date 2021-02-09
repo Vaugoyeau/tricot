@@ -143,7 +143,7 @@ grid_size <- function(h, w, ss) {
 ```
   
 ```{r examples-2}
-grid_size(5, 5, square_size(31,24)) 
+grid_size(20, 20, square_size(31,24)) 
 grid_size(5, 5, square_size(35,26))
 ```
 
@@ -164,23 +164,24 @@ Faire une condition sur le type d'image !!!
 
 #' Pixel size in image
 #'
-#' @param image_height Magick image height
-#' @param image_width Magick image width
-#' @param gs Size grid calculated from grid_size()
+#' @param img Magick image
+#' @param gs Grid size calculated from grid_size()
+#' @inheritParams magick::image_info 
 #'
 #' @return
-#' Square size of image
+#' Pixel size of knitting image
 #' @export
 #'
 #' @examples
-pixel_size <- function(image_height, image_width, gs) {
+pixel_size <- function(img, gs) {
   
-  if (!is.numeric(image_height)) {stop("image_height should be numeric")}
-  if (!is.numeric(image_width)) {stop("image_width should be numeric")}
-  
+  if(class(img) != "magick-image") {stop("img must be magick image")}
+  if (!is.numeric(gs)) {stop("gs should be numeric")}
+  if (length(gs) != 2) {stop("gs should have only two values")}
+
   c(
-    pixel = floor(image_height/gs["grid.height"]),
-    pixel = floor(image_width/gs["grid.width"])
+    pixel = floor(magick::image_info(img)$height/gs["grid.height"]),
+    pixel = floor(magick::image_info(img)$width/gs["grid.width"])
   )
   
 }
@@ -189,14 +190,13 @@ pixel_size <- function(image_height, image_width, gs) {
   
 ```{r examples-3}
 
-pixel_size(1181, 1181, c("grid.height" = 31, "grid.width" = 24)) # Pingouin
-pixel_size(3509, 2481, c("grid.height" = 35, "grid.width" = 26)) # Montagne
+pixel_size(img, c("grid.height" = 35, "grid.width" = 26)) # Montagne
 
 ```
 
 ```{r tests-3}
 test_that("calcule pixel size and show error if needed", {
-  expect_true(sum(pixel_size(1181, 1181, c("grid.height" = 31, "grid.width" = 24)) == c(pixel.height = 38, pixel.width = 49)) == 2)
+  expect_true(sum(pixel_size(image_load("img/Pingouin.png"), c("grid.height" = 31, "grid.width" = 24)) == c(pixel.height = 38, pixel.width = 49)) == 2)
   expect_error(pixel_size("text"))
 })
 ```
@@ -205,6 +205,7 @@ test_that("calcule pixel size and show error if needed", {
 # Creation of new image  
   
 We assume that we have created a table with the values of each pixel using the function `magick::image_raster()`.  
+Non le faire dans la fonction puis faire une boucle.  
   
 ```{r function-4}
 
