@@ -157,6 +157,9 @@ test_that("calcule grid size and show error if needed", {
   
 # Calculate the square size in image     
   
+ATTENTION à modifier, on doit importer une image magick et non la taille de l'image !!!!  
+Faire une condition sur le type d'image !!!  
+  
 ```{r function-3}
 
 #' Pixel size in image
@@ -210,15 +213,21 @@ We assume that we have created a table with the values of each pixel using the f
 #' @param img_raster Magick image raster
 #' @param ps Pixel size calculated from pixel_size()
 #'
+#' @inheritParams magick::image_read 
+#' @inheritParams stringr::str_detect
+#'
 #' @return
 #' Knitting image
 #' @export
 #'
 #' @examples
-pixel_size <- function(image_height, image_width, gs) {
+knitting_image <- function(img, ps) {
   
   if (!is.numeric(image_height)) {stop("image_height should be numeric")}
   if (!is.numeric(image_width)) {stop("image_width should be numeric")}
+  
+  
+  img_raster <- magick::image_raster(img)
   
   c(
     pixel = floor(image_height/gs["grid.height"]),
@@ -237,7 +246,15 @@ ggplot2::ggplot(test) + ggplot2::aes(x = x, y = y, fill = col) + ggplot2::geom_p
 
 test <- tibble::tibble(x = rep(c(1:3), 2), y = rep(c(1:2),3), col = c("#ffffffff", "#ffedb7ff", "#efefefff", "#d9d9d9ff", "#ffc000ff", "#c7c7c7ff"))
 
-ggplot2::ggplot(test) + ggplot2::aes(x = x, y = y, fill = col) + ggplot2::geom_tile() + ggplot2::theme(legend.position = "none")
+ggplot2::ggplot(test) + 
+  ggplot2::aes(x = x, y = y, fill = col) + 
+  ggplot2::geom_raster() + 
+  ggplot2::scale_fill_manual(values = test$col) + 
+  ggplot2::theme(
+    legend.position = "none", 
+    panel.background = ggplot2::element_blank(),
+    panel.grid.major = ggplot2::element_line(colour = "black"),
+    panel.grid.minor = ggplot2::element_line(colour = "grey"))
 
 ```
 
