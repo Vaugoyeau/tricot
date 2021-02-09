@@ -157,9 +157,6 @@ test_that("calcule grid size and show error if needed", {
   
 # Calculate the square size in image     
   
-ATTENTION à modifier, on doit importer une image magick et non la taille de l'image !!!!  
-Faire une condition sur le type d'image !!!  
-  
 ```{r function-3}
 
 #' Pixel size in image
@@ -190,7 +187,7 @@ pixel_size <- function(img, gs) {
   
 ```{r examples-3}
 
-pixel_size(img, c("grid.height" = 35, "grid.width" = 26)) # Montagne
+pixel_size(img, gs) # Montagne
 
 ```
 
@@ -203,9 +200,6 @@ test_that("calcule pixel size and show error if needed", {
   
   
 # Creation of new image  
-  
-We assume that we have created a table with the values of each pixel using the function `magick::image_raster()`.  
-Non le faire dans la fonction puis faire une boucle.  
   
 ```{r function-4}
 
@@ -224,28 +218,73 @@ Non le faire dans la fonction puis faire une boucle.
 #' @examples
 knitting_image <- function(img, ps) {
   
-  if (!is.numeric(image_height)) {stop("image_height should be numeric")}
-  if (!is.numeric(image_width)) {stop("image_width should be numeric")}
+  if (class(img) != "magick-image") {stop("image should be magick image")}
+  if (!is.numeric(ps)) {stop("ps should be numeric")}
+  if (length(ps) != 2) {stop("ps should have two values")}
   
   
   img_raster <- magick::image_raster(img)
   
-  c(
-    pixel = floor(image_height/gs["grid.height"]),
-    pixel = floor(image_width/gs["grid.width"])
-  )
+  if (max(img_raster$x)/ps[2] == ceiling(max(img_raster$x)/ps[2])) {
+    image_x <- seq(from = 1, to = max(img_raster$x), by = ps[2])
+  } else {
+    image_x <- c(seq(from = 1, to = max(img_raster$x), by = ps[2]), max(img_raster$x))
+  }
+  
+    if (max(img_raster$y)/ps[1] == ceiling(max(img_raster$y)/ps[1])) {
+    image_y <- seq(from = 1, to = max(img_raster$y), by = ps[1])
+  } else {
+    image_y <- c(seq(from = 1, to = max(img_raster$y), by = ps[1]), max(img_raster$y))
+  }
+  
+  tricot <- tibble::tibble('x' = as.numeric(), 'y' = as.numeric(), 'col' = as.character())
+  
+  for (w in c(1:(length(image_x)-1))){
+    
+    for (h in c(1:(length(image_y)-1))){
+      
+      tricot <- dplyr::bind_rows(
+        tricot,
+        tibble::tibble(
+          x = w,
+          y = h,
+          col = as.character(
+            dplyr::select(
+              dplyr::slice(
+                dplyr::count(
+                  dplyr::filter(
+                    img_raster,
+                    dplyr::between(x, image_x[w], image_x[(w+1)]),
+                    dplyr::between(y, image_y[h], image_y[(h+1)])
+                  ),
+                  col
+                ),
+                1),
+              col
+            )
+          )
+        )
+      )
+ 
+    }
+    
+  }
+  
+  return(tricot)
   
 }
 
 ```
-
+  
+  
 ```{r test_mise_en_forme_image}
 
-test <- magick::image_raster(image_load("img/Pingouin.png"))
+test <- knitting_image(img, ps)
 
-ggplot2::ggplot(test) + ggplot2::aes(x = x, y = y, fill = col) + ggplot2::geom_point() + ggplot2::theme(legend.position = "none")
+test_bis <- tibble::tibble(x = rep(c(1:3), 2), y = rep(c(1:2),3), col = c("#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff"))
 
-test <- tibble::tibble(x = rep(c(1:3), 2), y = rep(c(1:2),3), col = c("#ffffffff", "#ffedb7ff", "#efefefff", "#d9d9d9ff", "#ffc000ff", "#c7c7c7ff"))
+test_bis <- tibble::tibble(x = rep(c(1:6), 4), y = rep(c(1:4), 6), col = c("#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff"))
+
 
 ggplot2::ggplot(test) + 
   ggplot2::aes(x = x, y = y, fill = col) + 
