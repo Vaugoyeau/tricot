@@ -281,34 +281,61 @@ knitting_image <- function(img, ps) {
 
 test <- knitting_image(img, ps)
 
-test_bis <- tibble::tibble(x = rep(c(1:3), 2), y = rep(c(1:2),3), col = c("#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff"))
+test_bis <- tibble::tibble(x = rep(c(1:3), 2), y = rep(c(1:2),each = 3), couleur = c("#595959ff", "#ffffffff", "#ffc105ff", "#00b050ff", "#d9d9d9ff", "#56B4E9"), nom = c("gris fonce", "blanc", "jaune", "vert", "gris clair", "bleu"))
 
-test_bis <- tibble::tibble(x = rep(c(1:6), 4), y = rep(c(1:4), 6), col = c("#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff"))
+scales::show_col(test_bis$couleur)
 
-test <- magick::image_scale(img, "35x26")
-test_raster <- magick::image_raster(test)
-
-# ggplot2::ggplot(data = data.frame(x = c(1:35), y = c(1:26))) + 
-#   ggplot2::aes(x = x, y = y) + 
-#   ggplot2::geom_point() + 
-#   ggplot2::theme(
-#     legend.position = "none", 
-#     panel.background = ggplot2::element_blank(),
-#     panel.grid.major = ggplot2::element_line(colour = "black"),
-#     panel.grid.minor = ggplot2::element_line(colour = "grey"))
-# 
-# plot(x = c(1:35), y = c(1:26))
-
-
-ggplot2::ggplot(test_raster) + 
-  ggplot2::aes(x = -x, y = -y, fill = col) + 
-  ggplot2::geom_raster() + 
-  ggplot2::scale_color_manual(values = test_raster$col) + 
+ggplot2::ggplot(test_bis) + 
+  ggplot2::aes(x = x, y = y, color = couleur) + 
+  ggplot2::geom_point(shape = 15, size = 50) + 
+  ggplot2::scale_color_manual(values = test_bis$couleur) + 
   ggplot2::theme(
     legend.position = "none", 
     panel.background = ggplot2::element_blank(),
     panel.grid.major = ggplot2::element_line(colour = "black"),
     panel.grid.minor = ggplot2::element_line(colour = "grey"))
+
+# j'ai bine toutes mes couleurs mais pas à la place désignée...
+
+test_bis <- tibble::tibble(x = rep(c(1:6), 4), y = rep(c(1:4), 6), col = c("#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff"))
+
+test <- magick::image_scale(peinture, "70x52")
+
+test_raster <- dplyr::arrange(magick::image_raster(test), col)
+
+
+# ggplot2::ggplot(data = tibble::tibble(x = c(1:35), y = sample(c(1:26), 35, replace = TRUE))) +
+#   ggplot2::aes(x = x, y = y) +
+#   ggplot2::theme(
+#     legend.position = "none",
+#     panel.background = ggplot2::element_blank(),
+#     panel.grid.major = ggplot2::element_line(colour = "black"),
+#     panel.grid.minor = ggplot2::element_line(colour = "grey"))
+# 
+# grid::grid.raster(test)
+# 
+# magick::image_flatten(
+#   grille,
+#   magick::image_scale(img, "35x26")
+# )
+
+ggplot2::ggplot(test_raster) + 
+  ggplot2::aes(x = x, y = max(y) + 1 - y, color = col) + 
+  ggplot2::geom_point(shape = 15) + 
+  ggplot2::scale_color_manual(values = dplyr::distinct(test_raster, col)$col) + 
+  # ggplot2::scale_y_reverse() +
+  ggplot2::theme(
+    legend.position = "none", 
+    panel.background = ggplot2::element_blank(),
+    panel.grid.major = ggplot2::element_line(colour = "black"),
+    panel.grid.minor = ggplot2::element_line(colour = "grey")
+    ) +
+  ggplot2::xlab("maille") +
+  ggplot2::ylab("rang")
+
+
+# donner le nombre de point en fonction des couleurs
+
 
 ```
 
