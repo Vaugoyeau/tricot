@@ -71,7 +71,9 @@ test_that("load image and show error if needed", {
   expect_error(image_load("text"))
 })
 ```
-
+  
+  
+  
 # Calculate the size of square based on the information provided on the label   
   
 Normally on the balls of wool there is the information to knit a square of 10 x 10 cm.
@@ -155,31 +157,62 @@ test_that("calcule grid size and show error if needed", {
 ```
   
   
-# Calculate the square size in image     
+# Creation image to knit       
   
 ```{r function-3}
 
-#' Pixel size in image
+#' Creation of knitting image
 #'
 #' @param img Magick image
 #' @param gs Grid size calculated from grid_size()
-#' @inheritParams magick::image_info 
+#' @inheritParams dplyr::arrange 
+#' @inheritParams magick::image_raster
+#' @inheritParams magick::image_scale
+#' @inheritParams ggplot2::ggplot
+#' @inheritParams ggplot2::aes
+#' @inheritParams ggplot2::geom_point
+#' @inheritParams ggplot2::scale_color_manual
+#' @inheritParams dplyr::distinct
+#' @inheritParams ggplot2::theme
+#' @inheritParams ggplot2::xlab
+#' @inheritParams ggplot2::ylab
 #'
 #' @return
-#' Pixel size of knitting image
+#' Knitting image
 #' @export
 #'
 #' @examples
-pixel_size <- function(img, gs) {
+knitting_image <- function(img, gs) {
   
   if(class(img) != "magick-image") {stop("img must be magick image")}
   if (!is.numeric(gs)) {stop("gs should be numeric")}
   if (length(gs) != 2) {stop("gs should have only two values")}
 
-  c(
-    pixel = floor(magick::image_info(img)$height/gs["grid.height"]),
-    pixel = floor(magick::image_info(img)$width/gs["grid.width"])
-  )
+  raster_image <- 
+    dplyr::arrange(
+      magick::image_raster(
+        magick::image_scale(
+          img, 
+          glue::glue('{gs["grid.width"]}x{gs["grid.height"]}'))
+        ), 
+      col
+      )
+    
+    
+  kimage <- ggplot2::ggplot(raster_image) + 
+    ggplot2::aes(x = x, y = max(y) + 1 - y, color = col) + 
+    ggplot2::geom_point(shape = 15) + 
+    ggplot2::scale_color_manual(values = dplyr::distinct(raster_image, col)$col) + 
+    ggplot2::theme(
+      legend.position = "none", 
+      panel.background = ggplot2::element_blank(),
+      panel.grid.major = ggplot2::element_line(colour = "black"),
+      panel.grid.minor = ggplot2::element_line(colour = "grey")
+    ) +
+    ggplot2::xlab("maille") +
+    ggplot2::ylab("rang")
+    
+  return(kimage)
   
 }
 
@@ -187,95 +220,30 @@ pixel_size <- function(img, gs) {
   
 ```{r examples-3}
 
-pixel_size(img, gs) # Montagne
+knitting_image(img, gs) # Montagne
 
 ```
 
 ```{r tests-3}
-test_that("calcule pixel size and show error if needed", {
-  expect_true(sum(pixel_size(image_load("img/Pingouin.png"), c("grid.height" = 31, "grid.width" = 24)) == c(pixel.height = 38, pixel.width = 49)) == 2)
-  expect_error(pixel_size("text"))
-})
-```
-  
-  
-# Creation of new image  
-  
-```{r function-4}
-
-#' Create image to knit
-#'
-#' @param img_raster Magick image raster
-#' @param ps Pixel size calculated from pixel_size()
-#'
-#' @inheritParams magick::image_read 
-#' @inheritParams stringr::str_detect
-#'
-#' @return
-#' Knitting image
-#' @export
-#'
-#' @examples
-knitting_image <- function(img, ps) {
-  
-  if (class(img) != "magick-image") {stop("image should be magick image")}
-  if (!is.numeric(ps)) {stop("ps should be numeric")}
-  if (length(ps) != 2) {stop("ps should have two values")}
-  
-  
-  img_raster <- magick::image_raster(img)
-  
-  if (max(img_raster$x)/ps[2] == ceiling(max(img_raster$x)/ps[2])) {
-    image_x <- seq(from = 1, to = max(img_raster$x), by = ps[2])
-  } else {
-    image_x <- c(seq(from = 1, to = max(img_raster$x), by = ps[2]), max(img_raster$x))
-  }
-  
-    if (max(img_raster$y)/ps[1] == ceiling(max(img_raster$y)/ps[1])) {
-    image_y <- seq(from = 1, to = max(img_raster$y), by = ps[1])
-  } else {
-    image_y <- c(seq(from = 1, to = max(img_raster$y), by = ps[1]), max(img_raster$y))
-  }
-  
-  tricot <- tibble::tibble('x' = as.numeric(), 'y' = as.numeric(), 'col' = as.character())
-  
-  for (w in c(1:(length(image_x)-1))){
-    
-    for (h in c(1:(length(image_y)-1))){
-      
-      tricot <- dplyr::bind_rows(
-        tricot,
-        tibble::tibble(
-          x = w,
-          y = h,
-          col = as.character(
-            dplyr::select(
-              dplyr::slice(
-                dplyr::count(
-                  dplyr::filter(
-                    img_raster,
-                    dplyr::between(x, image_x[w], image_x[(w+1)]),
-                    dplyr::between(y, image_y[h], image_y[(h+1)])
-                  ),
-                  col
-                ),
-                1),
-              col
-            )
+test_that(
+  "calcule knitting image", 
+  {
+    expect_true(
+      sum(
+        class(
+          knitting_image(
+            image_load("img/Pingouin.png"), 
+            c("grid.height" = 31, "grid.width" = 24)
           )
-        )
-      )
- 
-    }
-    
-  }
-  
-  return(tricot)
-  
-}
+        ) == "ggplot"
+      ) > 0)
+    expect_error(pixel_size("text"))
+  })
 
 ```
   
+  
+
   
 ```{r test_mise_en_forme_image}
 
@@ -296,8 +264,6 @@ ggplot2::ggplot(test_bis) +
     panel.grid.minor = ggplot2::element_line(colour = "grey"))
 
 # j'ai bine toutes mes couleurs mais pas à la place désignée...
-
-test_bis <- tibble::tibble(x = rep(c(1:6), 4), y = rep(c(1:4), 6), col = c("#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff", "#000000ff", "#00642dff", "#0070c0ff", "#00b050ff", "#00b0f0ff", "#ffc000ff"))
 
 test <- magick::image_scale(peinture, "70x52")
 
@@ -336,6 +302,11 @@ ggplot2::ggplot(test_raster) +
 
 # donner le nombre de point en fonction des couleurs
 
+
+# pb nombre de couleur
+test_col <- magick::image_raster(img)
+
+dplyr::distinct(test_col, col)
 
 ```
 
