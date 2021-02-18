@@ -1,14 +1,30 @@
 Package: tricot
-Version: 0.0.0.9000
 Title: Create a kniting image from an image
-Description: From any image, creation of an image to knit a rectangle representing the simplified image and a summary table of colors and number of stitches according to the chosen needles.
-Authors@R: c(person(given = "Marie",
-         family = "Vaugoyeau",
-         role = c("aut", "cre"),
-         email = "marie.vaugoyeau@gmail.com"),
-  person(given = "MStats",
-         role = "cph"))
+Version: 0.0.0.9000
+Authors@R: 
+    c(person(given = "Marie",
+             family = "Vaugoyeau",
+             role = c("aut", "cre"),
+             email = "marie.vaugoyeau@gmail.com"),
+      person(given = "MStats",
+             role = "cph"))
+Description: From any image, creation of an image to knit a
+    rectangle representing the simplified image and a summary table of
+    colors and number of stitches according to the chosen needles.
 License: MIT + file LICENSE
+Imports: 
+    dplyr,
+    DT,
+    ggplot2,
+    glue,
+    magick,
+    stringr
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

@@ -26,7 +26,8 @@ fusen::fill_description(
       person("Marie", "Vaugoyeau", email = "marie.vaugoyeau@gmail.com", role = c("aut", "cre")),
       person(given = "MStats", role = "cph")
     )
-  )
+  ),
+  overwrite = TRUE
 )
 # Define License with use_*_license()
 usethis::use_mit_license("Marie Vaugoyeau")
@@ -59,10 +60,10 @@ image_load <- function(path) {
 ```
   
 ```{r examples}
-image_load("img/PeintureLaetitia.jpg")
-image_load("img/Montagne.pdf")
-image_load("img/Pingouin.png")
-image_load("img/Monstre.tif")
+tricot::image_load("img/PeintureLaetitia.jpg")
+tricot::image_load("img/Montagne.pdf")
+tricot::image_load("img/Pingouin.png")
+tricot::image_load("img/Monstre.tif")
 ```
 
 ```{r tests}
@@ -92,7 +93,9 @@ Normally on the balls of wool there is the information to knit a square of 10 x 
 #' @examples
 square_size <- function(rg, m) {
   if (!is.numeric(rg)) {stop("rg should be numeric")}
+  if (length(rg) != 1) {stop("rg should have only one value")}
   if (!is.numeric(m)) {stop("m should be numeric")}
+  if (length(m) != 1) {stop("m should have only one value")}
   
   c(
     height = round(10/rg, 3),
@@ -103,8 +106,8 @@ square_size <- function(rg, m) {
 ```
   
 ```{r examples-1}
-square_size(31,24)
-square_size(35,26)
+tricot::square_size(31,24)
+tricot::square_size(35,26)
 ```
 
 ```{r tests-1}
@@ -134,7 +137,11 @@ Calculation of the pixel size according to the size of the row and the previousl
 #' @examples
 grid_size <- function(h, w, ss) {
   if (!is.numeric(h)) {stop("h should be numeric")}
+  if (length(h) != 1) {stop("h should have only one value")}
   if (!is.numeric(w)) {stop("w should be numeric")}
+  if (length(w) != 1) {stop("w should have only one value")}
+  if (!is.numeric(ss)) {stop("gs should be numeric")}
+  if (length(ss) != 2) {stop("gs should have only two values")}
   
   c(
     grid = ceiling(h/ss["height"]),
@@ -145,8 +152,8 @@ grid_size <- function(h, w, ss) {
 ```
   
 ```{r examples-2}
-grid_size(20, 20, square_size(31,24)) 
-grid_size(5, 5, square_size(35,26))
+tricot::grid_size(20, 20, square_size(31,24)) 
+tricot::grid_size(5, 5, square_size(35,26))
 ```
 
 ```{r tests-2}
@@ -158,6 +165,8 @@ test_that("calcule grid size and show error if needed", {
   
   
 # Image to knit       
+  
+In Shiny app, knitting image will show with plotly `plotly::ggplotly()`.  
   
 ```{r function-3}
 
@@ -220,14 +229,14 @@ knitting_image <- function(img, gs) {
   
 ```{r examples-3}
 
-knitting_image(
-  image_load(
+tricot::knitting_image(
+  tricot::image_load(
     "img/Montagne.pdf"
     ), 
-  grid_size(
+  tricot::grid_size(
     20, 
     30, 
-    square_size(
+    tricot::square_size(
       35,
       26
     )
@@ -249,10 +258,12 @@ test_that(
           )
         ) == "ggplot"
       ) > 0)
-    expect_error(pixel_size("text"))
+    expect_error(knitting_image("text"))
   })
 
 ```
+  
+  
   
 # Wool needed calclulation           
   
@@ -261,9 +272,9 @@ test_that(
 #' Calculation of the wool quantity needed
 #'
 #' @param img_k ggplot image from knitting_image()
-#' @param h Expected height (cm) of knitting
-#' @param w Expected width (cm) of knitting
-#' @param p Weight to make the test square of 10*10
+#' @param rg Row number to have 10 cm
+#' @param m Stitch number to have 10 cm
+#' @param p Weight (g) to make the test square of 10*10
 #' @inheritParams dplyr::arrange 
 #' @inheritParams magick::image_raster
 #' @inheritParams magick::image_scale
@@ -281,232 +292,97 @@ test_that(
 #' @export
 #'
 #' @examples
-whool_weigth_needed <- function(img_k, h, w, p) {
+wool_weigth_needed <- function(img_k, rg, m, p) {
   
-  if(sum(class(img) != "ggplot") > 0) {stop("img must be ggplot")}
-  if (!is.numeric(h)) {stop("h should be numeric")}
-  if (length(h) != 1) {stop("h should have only one value")}
-  if (!is.numeric(w)) {stop("w should be numeric")}
-  if (length(w) != 1) {stop("w should have only one value")}
+  if(sum(class(img_k) != "ggplot") == 0) {stop("img_k must be ggplot")}
+  if (!is.numeric(rg)) {stop("rg should be numeric")}
+  if (length(rg) != 1) {stop("rg should have only one value")}
+  if (!is.numeric(m)) {stop("m should be numeric")}
+  if (length(m) != 1) {stop("m should have only one value")}
   if (!is.numeric(p)) {stop("p should be numeric")}
-  if (length(gs) != 1) {stop("p should have only one value")}
+  if (length(p) != 1) {stop("p should have only one value")}
   
-  knit_area <- h*w
-  
-  # Stop ici, Laëtitia a finie sa sieste !!!!
-
-  raster_image <- 
-    dplyr::arrange(
-      magick::image_raster(
-        magick::image_scale(
-          img, 
-          glue::glue('{gs["grid.width"]}x{gs["grid.height"]}!'))
-        ), 
-      col
+  table <- dplyr::mutate(
+        dplyr::count(
+          img_k$data, 
+          col
+        ),
+        "wool_needed (g)" = round(n * p / (rg * m), digits = 2)
       )
-    
-    
-  kimage <- ggplot2::ggplot(raster_image) + 
-    ggplot2::aes(x = x, y = max(y) + 1 - y, color = col) + 
-    ggplot2::geom_point(shape = 15) + 
-    ggplot2::scale_color_manual(values = dplyr::distinct(raster_image, col)$col) + 
-    ggplot2::theme(
-      legend.position = "none", 
-      panel.background = ggplot2::element_blank(),
-      panel.grid.major = ggplot2::element_line(colour = "black"),
-      panel.grid.minor = ggplot2::element_line(colour = "grey")
-    ) +
-    ggplot2::xlab("maille") +
-    ggplot2::ylab("rang")
-    
-  return(kimage)
   
+  table_couleur <-
+    DT::formatStyle(
+      DT::datatable(table),
+      "col",
+      backgroundColor = 
+        DT::styleEqual(
+          dplyr::distinct(table, col)$col,
+          dplyr::distinct(table, col)$col
+        )
+    )
+  
+  return(table_couleur)
 }
 
 ```
   
-```{r examples-3}
+```{r examples-4}
 
-knitting_image(
-  image_load(
+tricot::wool_weigth_needed(
+  tricot::knitting_image(
+  tricot::image_load(
     "img/Montagne.pdf"
     ), 
-  grid_size(
+  tricot::grid_size(
     20, 
     30, 
-    square_size(
+    tricot::square_size(
       35,
       26
     )
     )
-  )
+  ),
+  35,
+  26,
+  100
+)
 
 ```
 
-```{r tests-3}
+```{r tests-4}
 test_that(
   "calcule knitting image", 
   {
     expect_true(
       sum(
         class(
-          knitting_image(
-            image_load("img/Pingouin.png"), 
-            c("grid.height" = 31, "grid.width" = 24)
+          wool_weigth_needed(
+            knitting_image(
+              image_load(
+                "img/Pingouin.png"
+              ), 
+              grid_size(
+                30, 
+                30, 
+                square_size(
+                  35,
+                  26
+                )
+              )
+            ),
+            35,
+            26,
+            100
           )
-        ) == "ggplot"
+        ) == "datatables"
       ) > 0)
-    expect_error(pixel_size("text"))
+    expect_error(wool_weigth_needed("text"))
   })
 
 ```  
-
-  
-```{r test_mise_en_forme_image}
-
-
-img <- 
-  # image_load("img/Monstre.tif")
-  image_load("img/Pingouin.png")
-
-
-ss <- square_size(35, 26)
-
-gs <- grid_size(20, 20, ss)
-
-img_k <- knitting_image(
-  img,
-  gs
-)
-
-
-
-# pb nombre de couleur
-test_col <- magick::image_raster(img)
-
-sum(dplyr::count(img_k$data, col)$n)
-
-```
-
-  
-STOP, je me suis arrêtée là !
-  
-  
-# Application of grid on image     
-  
-Now we have grid size and image, we need to find color of each pixel of grid.  
-  
-```{r function-3}
-
-#' Extract color from square
-#'
-#' @param image Magick image from image_load
-#' @param w Expected width (cm) of knitting
-#' @param ss Size square calculated from square_size()
-#'
-#' @return
-#' Grid size to do grid on image
-#' @export
-#'
-#' @examples
-grid_size <- function(h, w, ss) {
-  if (!is.numeric(h)) {stop("h should be numeric")}
-  if (!is.numeric(w)) {stop("w should be numeric")}
-  
-  c(
-    grid_height = ceiling(h/ss["height"]),
-    grid_width = ceiling(w/ss["width"])
-  )
-}
-
-```
-  
-```{r examples-2}
-grid_size(5, 5, square_size(31,24)) 
-grid_size(5, 5, square_size(35,26))
-```
-
-```{r tests-2}
-test_that("calcule grid size and show error if needed", {
-  expect_true(sum(grid_size(5, 5, square_size(35,26)) == c(grid_height = 18, grid_width = 13)) == 2)
-  expect_error(square_size("text"))
-})
-```
   
   
   
-
-
-
-
-# Calculate the median of a vector
-
-```{r function}
-#' My median
-#'
-#' @param x Vector of Numeric values
-#' @inheritParams stats::median
-#'
-#' @return
-#' Median of vector x
-#' @export
-#'
-#' @examples
-my_median <- function(x, na.rm = TRUE) {
-  if (!is.numeric(x)) {stop("x should be numeric")}
-  stats::median(x, na.rm = na.rm)
-}
-```
-
-```{r examples}
-my_median(1:12)
-```
-
-```{r tests}
-test_that("my_median works properly and show error if needed", {
-  expect_true(my_median(1:12) == 6.5)
-  expect_error(my_median("text"))
-})
-```
-
-# Calculate the mean of a vector
-## Use sub-functions in the same chunk
-
-```{r function-1}
-#' My Other median
-#'
-#' @param x Vector of Numeric values
-#' @inheritParams stats::median
-#'
-#' @return
-#' Median of vector x
-#' @export
-#'
-#' @examples
-my_other_median <- function(x, na.rm = TRUE) {
-  if (!is.numeric(x)) {stop("x should be numeric")}
-  sub_median(x, na.rm =na.rm)
-}
-
-#' Core of the median not exported
-#' @param x Vector of Numeric values
-#' @inheritParams stats::median
-sub_median <- function(x, na.rm = TRUE) {
-  stats::median(x, na.rm)
-}
-```
-
-```{r examples-1}
-my_other_median(1:12)
-```
-
-```{r tests-1}
-test_that("my_median works properly and show error if needed", {
-  expect_true(my_other_median(1:12) == 6.5)
-  expect_error(my_other_median("text"))
-})
-```
-
 # There can be development actions
 
 These will be included in the `dev_history.R` file of your package, but won't be direct part of it.

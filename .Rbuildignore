@@ -3,3 +3,4 @@ dev
 ^LICENSE\.md$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^tricot\.Rproj$

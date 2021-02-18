@@ -1,0 +1,158 @@
+---
+title: "exploration"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{exploration}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(tricot)
+```
+
+<!--
+
+# Description of your package
+
+This will fill the description of your package.
+Add this chunk using `fusen::description_chunk()`
+--> 
+
+
+  
+  
+
+# Load image  
+
+  
+
+```{r examples}
+tricot::image_load("img/PeintureLaetitia.jpg")
+tricot::image_load("img/Montagne.pdf")
+tricot::image_load("img/Pingouin.png")
+tricot::image_load("img/Monstre.tif")
+```
+
+  
+  
+  
+
+# Square size calculation based on the information provided on the label   
+
+  
+Normally on the balls of wool there is the information to knit a square of 10 x 10 cm.
+  
+
+  
+
+```{r examples-1}
+tricot::square_size(31,24)
+tricot::square_size(35,26)
+```
+
+  
+  
+
+# Gride size calculation from expected height and width   
+
+  
+Calculation of the pixel size according to the size of the row and the previously given stitch and with the size of the knit you are looking for.  
+  
+
+  
+
+```{r examples-2}
+tricot::grid_size(20, 20, square_size(31,24)) 
+tricot::grid_size(5, 5, square_size(35,26))
+```
+
+  
+  
+
+# Image to knit       
+
+  
+In Shiny app, knitting image will show with plotly `plotly::ggplotly()`.  
+  
+
+  
+
+```{r examples-3}
+
+tricot::knitting_image(
+  tricot::image_load(
+    "img/Montagne.pdf"
+    ), 
+  tricot::grid_size(
+    20, 
+    30, 
+    tricot::square_size(
+      35,
+      26
+    )
+    )
+  )
+
+```
+
+  
+  
+  
+
+# Wool needed calclulation           
+
+  
+
+  
+
+```{r examples-4}
+
+tricot::wool_weigth_needed(
+  tricot::knitting_image(
+  tricot::image_load(
+    "img/Montagne.pdf"
+    ), 
+  tricot::grid_size(
+    20, 
+    30, 
+    tricot::square_size(
+      35,
+      26
+    )
+    )
+  ),
+  35,
+  26,
+  100
+)
+
+```
+
+  
+  
+  
+
+# There can be development actions
+
+These will be included in the `dev_history.R` file of your package, but won't be direct part of it.
+
+
+# Inflate your package
+
+You're one inflate from paper to box.
+Build your package from this very Rmarkdown using `fusen::inflate()`
+
+- Verify your `"DESCRIPTION"` file has been updated
+- Verify your function is in `"R/"` directory
+- Verify your test is in `"tests/testthat/"` directory
+- Verify this Rmd appears in `"vignettes/"` directory
+
+
