@@ -35,10 +35,10 @@ Add this chunk using `fusen::description_chunk()`
   
 
 ```{r examples}
-tricot::image_load("img/PeintureLaetitia.jpg")
-tricot::image_load("img/Montagne.pdf")
-tricot::image_load("img/Pingouin.png")
-tricot::image_load("img/Monstre.tif")
+tricot::image_load(here::here("img", "PeintureLaetitia.jpg"))
+tricot::image_load(here::here("img", "Montagne.pdf"))
+tricot::image_load(here::here("img", "Pingouin.png"))
+tricot::image_load(here::here("img", "Monstre.tif"))
 ```
 
   
@@ -89,7 +89,7 @@ In Shiny app, knitting image will show with plotly `plotly::ggplotly()`.
 
 tricot::knitting_image(
   tricot::image_load(
-    "img/Montagne.pdf"
+    here::here("img", "Montagne.pdf")
     ), 
   tricot::grid_size(
     20, 
@@ -100,6 +100,49 @@ tricot::knitting_image(
     )
     )
   )
+
+tricot::knitting_image(
+  tricot::image_load(
+    here::here("img", "Monstre.tif")
+    ), 
+  tricot::grid_size(
+    30, 
+    30, 
+    tricot::square_size(
+      35,
+      26
+    )
+    )
+  )
+
+tricot::knitting_image(
+  tricot::image_load(
+    here::here("img", "Pingouin.png")
+    ), 
+  tricot::grid_size(
+    20, 
+    20, 
+    tricot::square_size(
+      35,
+      26
+    )
+    )
+  )
+
+tricot::knitting_image(
+  tricot::image_load(
+    here::here("img", "PeintureLaetitia.jpg")
+    ), 
+  tricot::grid_size(
+    30, 
+    20, 
+    tricot::square_size(
+      35,
+      26
+    )
+    )
+  )
+
 
 ```
 
@@ -118,7 +161,7 @@ tricot::knitting_image(
 tricot::wool_weigth_needed(
   tricot::knitting_image(
   tricot::image_load(
-    "img/Montagne.pdf"
+    here::here("img", "Montagne.pdf")
     ), 
   tricot::grid_size(
     20, 
