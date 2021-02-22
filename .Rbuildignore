@@ -4,3 +4,4 @@ dev
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^tricot\.Rproj$
+^docs$
