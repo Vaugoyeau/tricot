@@ -68,8 +68,8 @@ tricot::image_load("img/Monstre.tif")
 
 ```{r tests}
 test_that("load image and show error if needed", {
-  expect_true(class(image_load("img/PeintureLaetitia.jpg")) == "magick-image")
-  expect_error(image_load("text"))
+  expect_true(class(tricot::image_load("img/PeintureLaetitia.jpg")) == "magick-image")
+  expect_error(tricot::image_load("text"))
 })
 ```
   
@@ -112,8 +112,8 @@ tricot::square_size(35,26)
 
 ```{r tests-1}
 test_that("calcule square size and show error if needed", {
-  expect_true(sum(square_size(31,24) == c(height = 0.323, width = 0.417)) == 2)
-  expect_error(square_size("text"))
+  expect_true(sum(tricot::square_size(31,24) == c(height = 0.323, width = 0.417)) == 2)
+  expect_error(tricot::square_size("text"))
 })
 ```
   
@@ -158,8 +158,8 @@ tricot::grid_size(5, 5, square_size(35,26))
 
 ```{r tests-2}
 test_that("calcule grid size and show error if needed", {
-  expect_true(sum(grid_size(5, 5, square_size(35,26)) == c(grid.height = 18, grid.width = 13)) == 2)
-  expect_error(square_size("text"))
+  expect_true(sum(tricot::grid_size(5, 5, tricot::square_size(35,26)) == c(grid.height = 18, grid.width = 13)) == 2)
+  expect_error(tricot::square_size("text"))
 })
 ```
   
@@ -252,13 +252,13 @@ test_that(
     expect_true(
       sum(
         class(
-          knitting_image(
-            image_load("img/Pingouin.png"), 
+          tricot::knitting_image(
+            tricot::image_load("img/Pingouin.png"), 
             c("grid.height" = 31, "grid.width" = 24)
           )
         ) == "ggplot"
       ) > 0)
-    expect_error(knitting_image("text"))
+    expect_error(tricot::knitting_image("text"))
   })
 
 ```
@@ -356,15 +356,15 @@ test_that(
     expect_true(
       sum(
         class(
-          wool_weigth_needed(
-            knitting_image(
-              image_load(
+          tricot::wool_weigth_needed(
+            tricot::knitting_image(
+              tricot::image_load(
                 "img/Pingouin.png"
               ), 
-              grid_size(
+              tricot::grid_size(
                 30, 
                 30, 
-                square_size(
+                tricot::square_size(
                   35,
                   26
                 )
@@ -376,7 +376,7 @@ test_that(
           )
         ) == "datatables"
       ) > 0)
-    expect_error(wool_weigth_needed("text"))
+    expect_error(tricot::wool_weigth_needed("text"))
   })
 
 ```  

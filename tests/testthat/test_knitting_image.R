@@ -4,12 +4,12 @@ test_that(
     expect_true(
       sum(
         class(
-          knitting_image(
-            image_load("img/Pingouin.png"), 
+          tricot::knitting_image(
+            tricot::image_load("img/Pingouin.png"), 
             c("grid.height" = 31, "grid.width" = 24)
           )
         ) == "ggplot"
       ) > 0)
-    expect_error(knitting_image("text"))
+    expect_error(tricot::knitting_image("text"))
   })
 
