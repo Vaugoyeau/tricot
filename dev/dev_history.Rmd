@@ -354,7 +354,10 @@ wool_weigth_needed <- function(img_k, rg, m, p) {
   
   table_couleur <-
     DT::formatStyle(
-      DT::datatable(table),
+      DT::datatable(
+        table,
+        rownames = FALSE
+        ),
       "col",
       backgroundColor = 
         DT::styleEqual(
