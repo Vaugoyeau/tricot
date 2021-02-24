@@ -21,11 +21,53 @@ Creation of knitting image
 
 tricot::knitting_image(
   tricot::image_load(
-    "img/Montagne.pdf"
+    here::here("img", "Montagne.pdf")
     ), 
   tricot::grid_size(
     20, 
     30, 
+    tricot::square_size(
+      35,
+      26
+    )
+    )
+  )
+
+tricot::knitting_image(
+  tricot::image_load(
+    here::here("img", "Monstre.tif")
+    ), 
+  tricot::grid_size(
+    30, 
+    30, 
+    tricot::square_size(
+      35,
+      26
+    )
+    )
+  )
+
+tricot::knitting_image(
+  tricot::image_load(
+    here::here("img", "Pingouin.png")
+    ), 
+  tricot::grid_size(
+    20, 
+    20, 
+    tricot::square_size(
+      35,
+      26
+    )
+    )
+  )
+
+tricot::knitting_image(
+  tricot::image_load(
+    here::here("img", "PeintureLaetitia.jpg")
+    ), 
+  tricot::grid_size(
+    30, 
+    20, 
     tricot::square_size(
       35,
       26
