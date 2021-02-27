@@ -7,7 +7,7 @@ test_that(
           tricot::wool_weigth_needed(
             tricot::knitting_image(
               tricot::image_load(
-                "img/Pingouin.png"
+                here::here("img", "Pingouin.png")
               ), 
               tricot::grid_size(
                 30, 

@@ -16,8 +16,8 @@ Magick image in R
 Load image
 }
 \examples{
-tricot::image_load("img/PeintureLaetitia.jpg")
-tricot::image_load("img/Montagne.pdf")
-tricot::image_load("img/Pingouin.png")
-tricot::image_load("img/Monstre.tif")
+tricot::image_load(here::here("img", "PeintureLaetitia.jpg"))
+tricot::image_load(here::here("img", "Montagne.pdf"))
+tricot::image_load(here::here("img", "Pingouin.png"))
+tricot::image_load(here::here("img", "Monstre.tif"))
 }

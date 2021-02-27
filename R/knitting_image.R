@@ -94,8 +94,14 @@ knitting_image <- function(img, gs) {
       )
     
     
-  kimage <- ggplot2::ggplot(raster_image) + 
-    ggplot2::aes(x = x, y = max(y) + 1 - y, color = col) + 
+  kimage <- ggplot2::ggplot(
+    dplyr::mutate(
+      raster_image,
+      "maille" = x,
+      "rang" = max(y) + 1 - y
+      ) 
+    ) + 
+    ggplot2::aes(x = maille, y = rang, color = col) + 
     ggplot2::geom_point(shape = 15) + 
     ggplot2::scale_color_manual(values = dplyr::distinct(raster_image, col)$col) + 
     ggplot2::theme(
@@ -103,9 +109,7 @@ knitting_image <- function(img, gs) {
       panel.background = ggplot2::element_blank(),
       panel.grid.major = ggplot2::element_line(colour = "black"),
       panel.grid.minor = ggplot2::element_line(colour = "grey")
-    ) +
-    ggplot2::xlab("maille") +
-    ggplot2::ylab("rang")
+    )
     
   return(kimage)
   

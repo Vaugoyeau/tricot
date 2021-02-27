@@ -26,7 +26,7 @@ Calculation of the wool quantity needed
 tricot::wool_weigth_needed(
   tricot::knitting_image(
   tricot::image_load(
-    "img/Montagne.pdf"
+    here::here("img", "Montagne.pdf")
     ), 
   tricot::grid_size(
     20, 

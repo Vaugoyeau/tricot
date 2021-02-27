@@ -60,10 +60,10 @@ image_load <- function(path) {
 ```
   
 ```{r examples}
-tricot::image_load("img/PeintureLaetitia.jpg")
-tricot::image_load("img/Montagne.pdf")
-tricot::image_load("img/Pingouin.png")
-tricot::image_load("img/Monstre.tif")
+tricot::image_load(here::here("img", "PeintureLaetitia.jpg"))
+tricot::image_load(here::here("img", "Montagne.pdf"))
+tricot::image_load(here::here("img", "Pingouin.png"))
+tricot::image_load(here::here("img", "Monstre.tif"))
 ```
 
 ```{r tests}
@@ -208,8 +208,14 @@ knitting_image <- function(img, gs) {
       )
     
     
-  kimage <- ggplot2::ggplot(raster_image) + 
-    ggplot2::aes(x = x, y = max(y) + 1 - y, color = col) + 
+  kimage <- ggplot2::ggplot(
+    dplyr::mutate(
+      raster_image,
+      "maille" = x,
+      "rang" = max(y) + 1 - y
+      ) 
+    ) + 
+    ggplot2::aes(x = maille, y = rang, color = col) + 
     ggplot2::geom_point(shape = 15) + 
     ggplot2::scale_color_manual(values = dplyr::distinct(raster_image, col)$col) + 
     ggplot2::theme(
@@ -217,9 +223,7 @@ knitting_image <- function(img, gs) {
       panel.background = ggplot2::element_blank(),
       panel.grid.major = ggplot2::element_line(colour = "black"),
       panel.grid.minor = ggplot2::element_line(colour = "grey")
-    ) +
-    ggplot2::xlab("maille") +
-    ggplot2::ylab("rang")
+    )
     
   return(kimage)
   
@@ -376,7 +380,7 @@ wool_weigth_needed <- function(img_k, rg, m, p) {
 tricot::wool_weigth_needed(
   tricot::knitting_image(
   tricot::image_load(
-    "img/Montagne.pdf"
+    here::here("img", "Montagne.pdf")
     ), 
   tricot::grid_size(
     20, 
@@ -404,7 +408,7 @@ test_that(
           tricot::wool_weigth_needed(
             tricot::knitting_image(
               tricot::image_load(
-                "img/Pingouin.png"
+                here::here("img", "Pingouin.png")
               ), 
               tricot::grid_size(
                 30, 
